@@ -7,21 +7,44 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class MainFrame {
-    private JButton button1;
-    private JPanel panel1;
+    private JPanel mainPanel;
+    private JLabel valueDisplay;
+    private JPanel buttonPanel;
 
-    public MainFrame() {
-        button1.addActionListener(new ActionListener() {
+    private JButton button0;
+    private JButton button1;
+    private JButton button2;
+    private JButton button3;
+    private JButton button4;
+    private JButton button5;
+    private JButton button6;
+    private JButton button8;
+    private JButton button7;
+    private JButton button9;
+
+    private ActionListener BuildNumberActionListener(int number) {
+        return new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(null, "Hello");
+                valueDisplay.setText(Integer.toString(number));
             }
-        });
+        };
+    }
+
+    public MainFrame() {
+        JButton[] numberButtons = new JButton[] {
+                button0, button1, button2, button3, button4,
+                button5, button6, button7, button8, button9
+        };
+
+        for(int i = 0; i < numberButtons.length; i++) {
+            numberButtons[i].addActionListener(BuildNumberActionListener(i));
+        }
     }
 
     public static void main(String[] args) {
         JFrame frame = new JFrame("Calculator");
-        frame.setContentPane(new MainFrame().panel1);
+        frame.setContentPane(new MainFrame().mainPanel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
         frame.pack();
