@@ -7,6 +7,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class MainFrame {
+
+    private enum Operation {
+        NONE, ADD, MINUS, MULTIPLY, DIVIDE
+    }
+
     private JPanel mainPanel;
     private JLabel valueDisplay;
     private JPanel buttonPanel;
@@ -23,6 +28,11 @@ public class MainFrame {
     private JButton button7;
     private JButton button9;
     private JButton buttonSign;
+    private JButton buttonDivide;
+    private JButton buttonMultiply;
+    private JButton buttonMinus;
+    private JButton buttonAdd;
+    private JButton buttonEquals;
     //endregion
 
     //String currentOperand;
@@ -30,9 +40,16 @@ public class MainFrame {
     double currentOperand;
     boolean currentHasFraction;
 
+    Operation currentOperation;
+    double otherOperand;
+
     public MainFrame() {
         currentOperand = 0;
         currentHasFraction = false;
+
+        otherOperand = 0;
+        currentOperation = Operation.NONE;
+
         updateDisplay();
 
         JButton[] numberButtons = new JButton[] {
@@ -40,18 +57,30 @@ public class MainFrame {
                 button5, button6, button7, button8, button9
         };
         for(int i = 0; i < numberButtons.length; i++) {
-            numberButtons[i].addActionListener(NumberActionListener(i));
+            numberButtons[i].addActionListener(numberActionListener(i));
         }
 
+        buttonAdd.addActionListener     (operationActionListener(Operation.ADD));
+        buttonMinus.addActionListener   (operationActionListener(Operation.MINUS));
+        buttonMultiply.addActionListener(operationActionListener(Operation.MULTIPLY));
+        buttonDivide.addActionListener  (operationActionListener(Operation.DIVIDE));
+
+        buttonEquals.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                resolveOperation();
+            }
+        });
         buttonSign.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                currentOperand *= -1;
+                currentOperand = -currentOperand;
+                updateDisplay();
             }
         });
     }
 
-    private ActionListener NumberActionListener(int number) {
+    private ActionListener numberActionListener(int number) {
         return new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -61,12 +90,64 @@ public class MainFrame {
         };
     }
 
-    private void updateDisplay() {
-        double currentFraction = currentOperand % 1;
-        double currentWhole = currentOperand - currentFraction;
+    private ActionListener operationActionListener(Operation op) {
+        return new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                pushOperation(op);
+            }
+        };
+    }
 
+    private void updateDisplay() {
+
+        double currentFraction = currentOperand % 1;
+        //double currentWhole = currentOperand - currentFraction;
+
+        String text = "";
         if(currentFraction == 0) {
-            valueDisplay.setText(Long.toString((long)currentOperand));
+            text += (Long.toString((long)currentOperand));
+        }
+        else {
+            text += (Double.toString(currentOperand));
+        }
+
+        valueDisplay.setText(text);
+    }
+
+    private void pushOperation(Operation op) {
+
+        if(currentOperation != Operation.NONE) {
+            resolveOperation();
+        }
+
+        currentOperation = op;
+
+        // Also push operand. Don't update quite yet.
+        otherOperand = currentOperand;
+        currentOperand = 0;
+    }
+
+    private void resolveOperation() {
+        if(currentOperation != Operation.NONE) {
+
+            switch(currentOperation) {
+                case ADD:
+                    currentOperand += otherOperand;
+                    break;
+                case MINUS:
+                    currentOperand = otherOperand - currentOperand;
+                    break;
+                case MULTIPLY:
+                    currentOperand *= otherOperand;
+                    break;
+                case DIVIDE:
+                    currentOperand = otherOperand / currentOperand;
+                    break;
+            }
+
+            currentOperation = Operation.NONE;
+            updateDisplay();
         }
     }
 
