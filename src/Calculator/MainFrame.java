@@ -11,6 +11,7 @@ public class MainFrame {
     private JLabel valueDisplay;
     private JPanel buttonPanel;
 
+    //region Buttons
     private JButton button0;
     private JButton button1;
     private JButton button2;
@@ -21,24 +22,51 @@ public class MainFrame {
     private JButton button8;
     private JButton button7;
     private JButton button9;
+    private JButton buttonSign;
+    //endregion
 
-    private ActionListener BuildNumberActionListener(int number) {
-        return new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                valueDisplay.setText(Integer.toString(number));
-            }
-        };
-    }
+    //String currentOperand;
+    //double currentOperand;
+    double currentOperand;
+    boolean currentHasFraction;
 
     public MainFrame() {
+        currentOperand = 0;
+        currentHasFraction = false;
+        updateDisplay();
+
         JButton[] numberButtons = new JButton[] {
                 button0, button1, button2, button3, button4,
                 button5, button6, button7, button8, button9
         };
-
         for(int i = 0; i < numberButtons.length; i++) {
-            numberButtons[i].addActionListener(BuildNumberActionListener(i));
+            numberButtons[i].addActionListener(NumberActionListener(i));
+        }
+
+        buttonSign.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                currentOperand *= -1;
+            }
+        });
+    }
+
+    private ActionListener NumberActionListener(int number) {
+        return new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                currentOperand = currentOperand * 10 + number;
+                updateDisplay();
+            }
+        };
+    }
+
+    private void updateDisplay() {
+        double currentFraction = currentOperand % 1;
+        double currentWhole = currentOperand - currentFraction;
+
+        if(currentFraction == 0) {
+            valueDisplay.setText(Long.toString((long)currentOperand));
         }
     }
 
