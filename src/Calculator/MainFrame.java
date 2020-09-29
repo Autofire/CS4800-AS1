@@ -107,6 +107,7 @@ public class MainFrame {
                 }
             	else {
                     currentOperand.deleteCharAt(currentOperand.length() - 1);
+                    fixOperand();
                     updateDisplay();
                 }
             }
@@ -199,26 +200,35 @@ public class MainFrame {
     }
 
     private void fixOperand() {
-		boolean isNegative = currentOperand.charAt(0) == '-';
+        // It's possible to have an empty operand here.
+        // For that reason, we MUST check for that first.
+        // If the operand is empty, we'll say it's positive zero.
+		boolean isNegative = currentOperand.length() > 0 && currentOperand.charAt(0) == '-';
 
 		// If the number is negative, strip that out for now.
 		if(isNegative) {
 		    currentOperand.deleteCharAt(0);
         }
 
-        // Remove leading zeroes
-        String[] parts = currentOperand.toString().split(".");
-		if(parts.length == 0) {
-		    parts = new String[]{currentOperand.toString()};
+		if(currentOperand.length() == 0) {
+            // We're empty; stick a zero on
+            currentOperand.append('0');
         }
+		else {
+            // Remove leading zeroes
+            String[] parts = currentOperand.toString().split(".");
+            if (parts.length == 0) {
+                parts = new String[]{currentOperand.toString()};
+            }
 
-        StringBuilder wholePart = new StringBuilder(parts[0]);
-        while (wholePart.length() > 1 && wholePart.charAt(0) == '0') {
-            wholePart.deleteCharAt(0);
+            StringBuilder wholePart = new StringBuilder(parts[0]);
+            while (wholePart.length() > 1 && wholePart.charAt(0) == '0') {
+                wholePart.deleteCharAt(0);
+            }
+            parts[0] = wholePart.toString();
+
+            currentOperand = new StringBuilder(String.join(".", parts));
         }
-        parts[0] = wholePart.toString();
-
-        currentOperand = new StringBuilder(String.join(".", parts));
 
         // If we stripped a negative out, throw it back in.
         if(isNegative) {
