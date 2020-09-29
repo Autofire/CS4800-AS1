@@ -40,17 +40,14 @@ public class MainFrame {
 
     //String currentOperand;
     //double currentOperand;
-    double currentOperand;
-    boolean currentHasFraction;
+    StringBuilder currentOperand;
+    StringBuilder firstOperand;
 
     Operation currentOperation;
-    double otherOperand;
 
     public MainFrame() {
-        currentOperand = 0;
-        currentHasFraction = false;
-
-        otherOperand = 0;
+        currentOperand = new StringBuilder("0");
+        firstOperand = new StringBuilder("0");
         currentOperation = Operation.NONE;
 
         updateDisplay();
@@ -77,21 +74,27 @@ public class MainFrame {
         buttonSign.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                currentOperand = -currentOperand;
+                //currentOperand = -currentOperand;
+                if(currentOperand.charAt(0) == '-') {
+                    currentOperand.insert(0, "-");
+                }
+                else {
+                    currentOperand.deleteCharAt(0);
+                }
                 updateDisplay();
             }
         });
         buttonClearEntry.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                currentOperand = 0;
+                currentOperand = new StringBuilder("0");
                 updateDisplay();
             }
         });
         buttonClear.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                currentOperand = 0;
+                currentOperand = new StringBuilder("0");
                 currentOperation = Operation.NONE;
                 updateDisplay();
             }
@@ -108,7 +111,7 @@ public class MainFrame {
         return new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                currentOperand = currentOperand * 10 + number;
+                currentOperand.append(number);
                 updateDisplay();
             }
         };
@@ -124,20 +127,7 @@ public class MainFrame {
     }
 
     private void updateDisplay() {
-
-        double currentFraction = currentOperand % 1;
-        //double currentWhole = currentOperand - currentFraction;
-
-        String text = "";
-        if(currentFraction == 0) {
-            text += (Long.toString((long)currentOperand));
-        }
-        else {
-            text += (Double.toString(currentOperand));
-        }
-        text = (Double.toString(currentOperand));
-
-        valueDisplay.setText(text);
+        valueDisplay.setText(currentOperand.toString());
     }
 
     private void pushOperation(Operation op) {
@@ -149,27 +139,25 @@ public class MainFrame {
         currentOperation = op;
 
         // Also push operand. Don't update quite yet.
-        otherOperand = currentOperand;
-        currentOperand = 0;
+        firstOperand = currentOperand;
+        currentOperand = new StringBuilder("0");
     }
 
     private void resolveOperation() {
         if(currentOperation != Operation.NONE) {
 
+            double op1 = Double.parseDouble(firstOperand.toString());
+            double op2 = Double.parseDouble(currentOperand.toString());
+            double result = Double.NaN;
+
             switch(currentOperation) {
-                case ADD:
-                    currentOperand += otherOperand;
-                    break;
-                case MINUS:
-                    currentOperand = otherOperand - currentOperand;
-                    break;
-                case MULTIPLY:
-                    currentOperand *= otherOperand;
-                    break;
-                case DIVIDE:
-                    currentOperand = otherOperand / currentOperand;
-                    break;
+                case ADD:      result = op1 + op2; break;
+                case MINUS:    result = op1 - op2; break;
+                case MULTIPLY: result = op1 * op2; break;
+                case DIVIDE:   result = op1 / op2; break;
             }
+
+            currentOperand = new StringBuilder(Double.toString(result));
 
             currentOperation = Operation.NONE;
             updateDisplay();
