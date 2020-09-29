@@ -33,6 +33,9 @@ public class MainFrame {
     private JButton buttonMinus;
     private JButton buttonAdd;
     private JButton buttonEquals;
+    private JButton buttonClearEntry;
+    private JButton buttonDelete;
+    private JButton buttonClear;
     //endregion
 
     //String currentOperand;
@@ -78,6 +81,27 @@ public class MainFrame {
                 updateDisplay();
             }
         });
+        buttonClearEntry.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                currentOperand = 0;
+                updateDisplay();
+            }
+        });
+        buttonClear.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                currentOperand = 0;
+                currentOperation = Operation.NONE;
+                updateDisplay();
+            }
+        });
+        buttonDelete.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updateDisplay();
+            }
+        });
     }
 
     private ActionListener numberActionListener(int number) {
@@ -111,6 +135,7 @@ public class MainFrame {
         else {
             text += (Double.toString(currentOperand));
         }
+        text = (Double.toString(currentOperand));
 
         valueDisplay.setText(text);
     }
