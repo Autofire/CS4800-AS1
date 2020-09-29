@@ -199,7 +199,31 @@ public class MainFrame {
     }
 
     private void fixOperand() {
+		boolean isNegative = currentOperand.charAt(0) == '-';
 
+		// If the number is negative, strip that out for now.
+		if(isNegative) {
+		    currentOperand.deleteCharAt(0);
+        }
+
+        // Remove leading zeroes
+        String[] parts = currentOperand.toString().split(".");
+		if(parts.length == 0) {
+		    parts = new String[]{currentOperand.toString()};
+        }
+
+        StringBuilder wholePart = new StringBuilder(parts[0]);
+        while (wholePart.length() > 1 && wholePart.charAt(0) == '0') {
+            wholePart.deleteCharAt(0);
+        }
+        parts[0] = wholePart.toString();
+
+        currentOperand = new StringBuilder(String.join(".", parts));
+
+        // If we stripped a negative out, throw it back in.
+        if(isNegative) {
+            currentOperand.insert(0, '-');
+        }
     }
 
     private void updateDisplay() {
