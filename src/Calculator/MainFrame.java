@@ -9,7 +9,7 @@ import java.awt.event.ActionListener;
 public class MainFrame {
 
     private enum Operation {
-        NONE, ADD, MINUS, MULTIPLY, DIVIDE
+        NONE, PLUS, MINUS, TIMES, DIVIDE
     }
 
     private JPanel mainPanel;
@@ -29,9 +29,9 @@ public class MainFrame {
     private JButton button9;
     private JButton buttonSign;
     private JButton buttonDivide;
-    private JButton buttonMultiply;
+    private JButton buttonTimes;
     private JButton buttonMinus;
-    private JButton buttonAdd;
+    private JButton buttonPlus;
     private JButton buttonEquals;
     private JButton buttonClearEntry;
     private JButton buttonDelete;
@@ -42,6 +42,7 @@ public class MainFrame {
     //double currentOperand;
     StringBuilder currentOperand;
     StringBuilder firstOperand;
+    boolean currentOperandIsResult;
 
     Operation currentOperation;
 
@@ -49,6 +50,7 @@ public class MainFrame {
         currentOperand = new StringBuilder("0");
         firstOperand = new StringBuilder("0");
         currentOperation = Operation.NONE;
+        currentOperandIsResult = false;
 
         updateDisplay();
 
@@ -60,10 +62,10 @@ public class MainFrame {
             numberButtons[i].addActionListener(numberActionListener(i));
         }
 
-        buttonAdd.addActionListener     (operationActionListener(Operation.ADD));
-        buttonMinus.addActionListener   (operationActionListener(Operation.MINUS));
-        buttonMultiply.addActionListener(operationActionListener(Operation.MULTIPLY));
-        buttonDivide.addActionListener  (operationActionListener(Operation.DIVIDE));
+        buttonPlus.addActionListener  (operationActionListener(Operation.PLUS));
+        buttonMinus.addActionListener (operationActionListener(Operation.MINUS));
+        buttonTimes.addActionListener (operationActionListener(Operation.TIMES));
+        buttonDivide.addActionListener(operationActionListener(Operation.DIVIDE));
 
         buttonEquals.addActionListener(new ActionListener() {
             @Override
@@ -74,8 +76,7 @@ public class MainFrame {
         buttonSign.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //currentOperand = -currentOperand;
-                if(currentOperand.charAt(0) == '-') {
+                if(currentOperand.charAt(0) != '-') {
                     currentOperand.insert(0, "-");
                 }
                 else {
@@ -102,6 +103,7 @@ public class MainFrame {
         buttonDelete.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+            	currentOperand.deleteCharAt(currentOperand.length()-1);
                 updateDisplay();
             }
         });
@@ -111,7 +113,14 @@ public class MainFrame {
         return new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                currentOperand.append(number);
+            	if(currentOperandIsResult) {
+            	    currentOperand = new StringBuilder(Integer.toString(number));
+            	    currentOperandIsResult = false;
+                }
+            	else {
+                    currentOperand.append(number);
+                }
+
                 updateDisplay();
             }
         };
@@ -140,6 +149,7 @@ public class MainFrame {
 
         // Also push operand. Don't update quite yet.
         firstOperand = currentOperand;
+        currentOperandIsResult = false;
         currentOperand = new StringBuilder("0");
     }
 
@@ -151,15 +161,16 @@ public class MainFrame {
             double result = Double.NaN;
 
             switch(currentOperation) {
-                case ADD:      result = op1 + op2; break;
-                case MINUS:    result = op1 - op2; break;
-                case MULTIPLY: result = op1 * op2; break;
-                case DIVIDE:   result = op1 / op2; break;
+                case PLUS:   result = op1 + op2; break;
+                case MINUS:  result = op1 - op2; break;
+                case TIMES:  result = op1 * op2; break;
+                case DIVIDE: result = op1 / op2; break;
             }
 
             currentOperand = new StringBuilder(Double.toString(result));
 
             currentOperation = Operation.NONE;
+            currentOperandIsResult = true;
             updateDisplay();
         }
     }
