@@ -36,6 +36,7 @@ public class MainFrame {
     private JButton buttonClearEntry;
     private JButton buttonDelete;
     private JButton buttonClear;
+    private JButton buttonDecimal;
     //endregion
 
     //String currentOperand;
@@ -88,23 +89,39 @@ public class MainFrame {
         buttonClearEntry.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                currentOperand = new StringBuilder("0");
-                updateDisplay();
+            	clearOperand();
             }
         });
         buttonClear.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                currentOperand = new StringBuilder("0");
+            	clearOperand();
                 currentOperation = Operation.NONE;
-                updateDisplay();
             }
         });
         buttonDelete.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            	currentOperand.deleteCharAt(currentOperand.length()-1);
-                updateDisplay();
+            	if(currentOperandIsResult) {
+            	    clearOperand();
+                }
+            	else {
+                    currentOperand.deleteCharAt(currentOperand.length() - 1);
+                    updateDisplay();
+                }
+            }
+        });
+        buttonDecimal.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Need to check this if the result has a decimal place in it.
+                if(currentOperandIsResult) {
+                    clearOperand();
+                }
+
+                if(currentOperand.indexOf(".") == -1) {
+                    appendToOperand('.');
+                }
             }
         });
     }
@@ -113,15 +130,7 @@ public class MainFrame {
         return new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            	if(currentOperandIsResult) {
-            	    currentOperand = new StringBuilder(Integer.toString(number));
-            	    currentOperandIsResult = false;
-                }
-            	else {
-                    currentOperand.append(number);
-                }
-
-                updateDisplay();
+            	appendToOperand(Integer.toString(number).charAt(0));
             }
         };
     }
@@ -133,10 +142,6 @@ public class MainFrame {
                 pushOperation(op);
             }
         };
-    }
-
-    private void updateDisplay() {
-        valueDisplay.setText(currentOperand.toString());
     }
 
     private void pushOperation(Operation op) {
@@ -174,6 +179,33 @@ public class MainFrame {
             updateDisplay();
         }
     }
+
+    private void clearOperand() {
+        currentOperand = new StringBuilder("0");
+        currentOperandIsResult = false;
+        updateDisplay();
+    }
+
+    private void appendToOperand(char newChar) {
+
+        if(currentOperandIsResult) {
+        	clearOperand();
+        }
+
+        currentOperand.append(newChar);
+
+        fixOperand();
+        updateDisplay();
+    }
+
+    private void fixOperand() {
+
+    }
+
+    private void updateDisplay() {
+        valueDisplay.setText(currentOperand.toString());
+    }
+
 
     public static void main(String[] args) {
         JFrame frame = new JFrame("Calculator");
