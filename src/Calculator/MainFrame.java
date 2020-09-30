@@ -177,7 +177,7 @@ public class MainFrame {
                 case DIVIDE: result = op1 / op2; break;
             }
 
-            if(result % 1 > 0.000001) {
+            if(Math.abs(result) % 1 > 0.0000001) {
                 currentOperand = new StringBuilder(
                         String.format("%f", result)
                 );
