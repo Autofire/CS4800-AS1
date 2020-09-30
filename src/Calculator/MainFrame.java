@@ -5,6 +5,7 @@ package Calculator;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 
 public class MainFrame {
 
@@ -60,6 +61,7 @@ public class MainFrame {
                 button5, button6, button7, button8, button9
         };
         for(int i = 0; i < numberButtons.length; i++) {
+            //numberButtons[i].setMnemonic(Integer.toString(i).charAt(0));
             numberButtons[i].addActionListener(numberActionListener(i));
         }
 
@@ -128,12 +130,14 @@ public class MainFrame {
     }
 
     private ActionListener numberActionListener(int number) {
-        return new ActionListener() {
+        ActionListener listener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
             	appendToOperand(Integer.toString(number).charAt(0));
             }
         };
+
+        return listener;
     }
 
     private ActionListener operationActionListener(Operation op) {
@@ -225,9 +229,12 @@ public class MainFrame {
         }
 		else {
             // Remove leading zeroes
-            String[] parts = currentOperand.toString().split(".");
-            if (parts.length == 0) {
-                parts = new String[]{currentOperand.toString()};
+            String[] parts = currentOperand.toString().split("\\.");
+
+            // If we end with '.', we need to preserve that.
+			// If the number already has digits after '.', then the split works.
+            if(currentOperand.charAt(currentOperand.length()-1) == '.') {
+                parts = new String[]{parts[0], ""};
             }
 
             StringBuilder wholePart = new StringBuilder(parts[0]);
