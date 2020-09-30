@@ -173,7 +173,16 @@ public class MainFrame {
                 case DIVIDE: result = op1 / op2; break;
             }
 
-            currentOperand = new StringBuilder(Double.toString(result));
+            if(result % 1 > 0.000001) {
+                currentOperand = new StringBuilder(
+                        String.format("%f", result)
+                );
+            }
+            else {
+                currentOperand = new StringBuilder(
+                        String.format("%.0f", result)
+                );
+            }
 
             currentOperation = Operation.NONE;
             currentOperandIsResult = true;
